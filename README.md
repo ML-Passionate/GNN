@@ -72,7 +72,5 @@ Combinar NLP e GNN para:
 ---
 
 Curso LOG disponível no https://www.youtube.com/live/Lj0-Qwzo_B0
-Deseja que eu gere um fluxograma para ilustrar esse pipeline?
-
 
 
