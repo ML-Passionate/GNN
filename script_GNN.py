@@ -9,17 +9,45 @@ Original file is located at
 # Dataset
 """
 
-!gdown 1r54BsSUwtnLkXubGYKiCz_TXgd1wtMH1
+# !gdown 
+#  pip install -U sentence-transformers
+#  pip install tf-kera
+#  pip install torch-geometric
+#  conda install -c conda-forge ffmpeg
+#
 
+import random
+import numpy as np
 import pandas as pd
+import networkx as nx
+import torch_geometric.utils as utils
+import matplotlib.animation as animation
+import plotly.io as pio
+pio.renderers.default = 'browser'
+from matplotlib.animation import PillowWriter
+from torch_geometric.nn import GAE
+from sentence_transformers import SentenceTransformer
+from sklearn.neighbors import kneighbors_graph
+
+
+#%%
+#
+#   carregar o dataset
+#
 
 df = pd.read_pickle('fcn.pkl')
 df = df[['text','class']]
 df
 
-"""# Geração de Embedding"""
-
-from sentence_transformers import SentenceTransformer
+#%%
+#
+#  Geração de Embedding - transforma o texto em vetor
+#
+#  A chamada sentence_transformers pertence à biblioteca sentence-transformers, 
+#  que é construída sobre o Hugging Face Transformers e otimizada para gerar embeddings 
+#  de sentenças e comparação semântica de textos.
+#
+#
 
 model = SentenceTransformer('sentence-transformers/distiluse-base-multilingual-cased')
 
@@ -28,10 +56,9 @@ embeddings = model.encode(df.text)
 df.at[:,'embedding'] = list(embeddings)
 df
 
-"""# Gerando Grafo"""
+#%%
 
-from sklearn.neighbors import kneighbors_graph
-import networkx as nx
+# Gerando Grafo
 
 A = kneighbors_graph(df.embedding.to_list(), 3)
 
@@ -42,7 +69,9 @@ for node in G.nodes():
   G.nodes[node]['label'] = 0 if df.iloc[node]['class'] == -1 else 1
   G.nodes[node]['text'] = df.iloc[node]['text']
 
-"""#Grafo"""
+#%%
+
+# Grafo
 
 list(G.nodes)[:10]
 
@@ -123,12 +152,10 @@ for node in G.nodes():
 
 show_graph(G)
 
+#%%
 """# Graph Autoencoder"""
 
-!pip install torch-geometric
-
-import random
-import numpy as np
+# !pip install torch-geometric
 
 """## Definindo nossa GNN"""
 
@@ -162,17 +189,26 @@ def train(gae, optimizer, graph):
 
   return float(loss), Hl
 
-"""## Exexutando treinando da GNN"""
+#%%
+#
+#
+## Exexutando treinando da GNN
 
-import torch_geometric.utils as utils
-from torch_geometric.nn import GAE
 
 random.seed(81)
 np.random.seed(81)
 torch.manual_seed(81)
 torch.cuda.manual_seed(81)
 
-device = torch.device('cuda')
+#
+#   como saber se seu micro tem suporte ao cuda?
+#   import torch
+#   print(torch.cuda.is_available())
+#
+#   se for False, então
+#   device = torch.device('cpu')
+
+device = torch.device('cpu')
 
 dataset = utils.from_networkx(G)
 
@@ -210,31 +246,55 @@ from matplotlib import animation
 
 labels_plot = np.array([G.nodes[node]['label'] for node in G.nodes])
 
+#%%
+#
+#   versão com gif
+#
+
+from matplotlib import animation
+from matplotlib.animation import PillowWriter
+import matplotlib.pyplot as plt
+
 def animate(i):
     embed = embs_list[i].detach().cpu().numpy()
     ax.clear()
     ax.scatter(embed[:, 0], embed[:, 1], s=50, c=labels_plot, cmap="hsv", vmin=-2, vmax=3)
-    plt.title(f'Epoch {i} | Loss: {losses[i]:.2f}', fontsize=15, pad=30)
+    ax.set_title(f'Epoch {i} | Loss: {losses[i]:.2f}', fontsize=15, pad=30)
+    ax.axis('off')
 
+# Criação da figura
 fig = plt.figure(figsize=(6, 6))
-
-plt.axis('off')
 ax = fig.add_subplot()
+
+# Garante que os ticks e eixos fiquem invisíveis
+plt.axis('off')
 plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
 
-anim = animation.FuncAnimation(fig, animate, np.arange(0, epochs, 1), interval=800, repeat=True)
-html = HTML(anim.to_html5_video())
+# Animação
+anim = animation.FuncAnimation(fig, animate, frames=np.arange(0, epochs, 1), interval=800, repeat=True)
 
-display(html)
+# Salvar como GIF com PillowWriter
+anim.save("animacao.gif", writer=PillowWriter(fps=1))
 
-"""## Obtendo representações da GNN"""
+# Exibir no notebook
+from IPython.display import Image
+Image(filename="animacao.gif")
+
+#%% 
+#
+## Obtendo representações da GNN"""
+#
 
 for node in G.nodes():
   G.nodes[node]['features_gae'] = Hl[node].detach().cpu().numpy()
 
 G.nodes[0]['features_gae']
 
-"""## Separando nossas noticias para avaliar"""
+#%%
+#
+#
+#  Separando nossas noticias para avaliar
+#
 
 x_int = []
 x_out = []
@@ -249,7 +309,10 @@ from sklearn.model_selection import train_test_split
 
 x_train, x_test = train_test_split(x_int, test_size=0.1, random_state=81) # separando em treino e teste
 
-"""# One-Class Learning"""
+#%% 
+#
+#
+#  One-Class Learning
 
 from sklearn.metrics import classification_report
 from sklearn.svm import OneClassSVM as OCSVM
@@ -266,10 +329,8 @@ y_pred = np.concatenate([y_int_pred, y_out_pred])
 
 print(classification_report(y_true, y_pred)) # avaliando
 
-"""# Vizualização
-
-## Função de decisão
-"""
+#%%
+# Vizualização
 
 fig = plt.figure(figsize=(10, 8))
 
@@ -291,16 +352,20 @@ plt.xlim((-0.5, 1.5))
 plt.ylim((-1.5, 2.5))
 plt.show()
 
-"""## Modelage em grafo com embeddings na posição"""
+#%%
+
+# Modelage em grafo com embeddings na posição
 
 for node in G.nodes():
   G.nodes[node]['pos'] = G.nodes[node]['features_gae']
 
 show_graph(G)
 
-"""#GNN de duas classes?
-
-"""
+#%%
+#
+#
+#  GNN de duas classes?
+#
 
 from sklearn.model_selection import train_test_split
 
@@ -363,7 +428,10 @@ torch.manual_seed(81)
 torch.cuda.manual_seed(81)
 
 criterion = nn.CrossEntropyLoss()
-device = torch.device('cuda')
+#
+#  Se cuda estiver instalado... trocar cpu popr cuda
+#
+device = torch.device('cpu')
 graph = utils.from_networkx(G)
 in_channels, out_channels = len(graph.features[0]), 2
 gcn = GCN(in_channels, out_channels)
