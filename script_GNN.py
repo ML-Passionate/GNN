@@ -59,6 +59,15 @@ df
 #%%
 
 # Gerando Grafo
+#
+# Construir um grafo de vizinhança onde cada nó representa uma amostra do DataFrame df, 
+# conectada a seus 3 vizinhos mais próximos com base nos embeddings.
+# A é a matriz de adjancência
+# df.embedding.to_list() transforma a coluna de embeddings do DataFrame em uma lista de vetores.
+# kneighbors_graph(..., 3) usa os 3 vizinhos mais próximos para cada vetor (ponto).
+# A é uma matriz esparsa onde A[i, j] = 1 se o ponto i é vizinho do ponto j.
+
+
 
 A = kneighbors_graph(df.embedding.to_list(), 3)
 
@@ -71,7 +80,7 @@ for node in G.nodes():
 
 #%%
 
-# Grafo
+# Faz o gráfico do Grafo no Plotly
 
 list(G.nodes)[:10]
 
@@ -153,29 +162,55 @@ for node in G.nodes():
 show_graph(G)
 
 #%%
-"""# Graph Autoencoder"""
+"""# Graph Autoencoder
+Por que usar um Autoencoder para Grafos (Graph Autoencoder - GAE)?
+Motivação:
+Dados em forma de grafo (como redes sociais, citações, moléculas, etc.) têm estrutura não-euclidiana.
+Um autoencoder é uma arquitetura que aprende a compactar e reconstruir dados. Quando aplicado a grafos, o objetivo é:
+Aprender uma representação vetorial (embedding) de cada nó, que preserve a estrutura do grafo.
+Com isso, você pode:
+
+Fazer redução de dimensionalidade
+
+Prever conexões (link prediction)
+
+Classificar nós com poucos rótulos (semi-supervisionado)
+
+Visualizar padrões na estrutura do grafo
+
+"""
 
 # !pip install torch-geometric
 
-"""## Definindo nossa GNN"""
 
 from torch_geometric.nn import GCNConv
 import torch
 import torch_geometric.utils as utils
 
 class GCNEncoder(torch.nn.Module):
+  # Cria um encoder com duas camadas de convolução sobre grafos (GCNConv, do PyTorch Geometric).
+  # Transforma os features de entrada (H0) em uma representação latente (H2), passando por ReLU.
   def __init__(self, in_channels, out_channels):
     super().__init__()
     self.conv1 = GCNConv(in_channels, 2 * out_channels)
     self.conv2 = GCNConv(2 * out_channels, out_channels)
 
   def forward(self, H0, A):
+    # H0: matriz de features dos nós.
+    # A: edge_index (a lista das conexões do grafo no formato do PyTorch Geometric).
+    # Resultado: vetor latente (embedding) de c
     H1 = self.conv1(H0, A).relu()
     H2 = self.conv2(H1, A)
-
     return H2
 
 def train(gae, optimizer, graph):
+   # Treina o Graph Autoencoder (gae) por um passo.
+   # gae.encode(...): produz os embeddings dos nós.
+   # gae.recon_loss(...): calcula a perda de reconstrução — ou seja, o quanto a rede consegue reconstruir as conexões reais entre nós a partir dos embeddings.
+   # loss.backward() e optimizer.step(): retropropagação e otimização.
+   # Retorna:
+       # loss: o valor da perda (indicador de performance)
+       # Hl: os embeddings dos nós
 
   gae.train()
   optimizer.zero_grad()
