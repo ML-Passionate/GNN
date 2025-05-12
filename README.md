@@ -1,9 +1,5 @@
 # GNN
 
-Resumo de embeddings: https://github.com/ML-Passionate/GNN/blob/main/EMBEDDINGS.md
-
-Curso LOG disponível no https://www.youtube.com/live/Lj0-Qwzo_B0
-
 Esse código implementa um fluxo completo de processamento de notícias usando **Redes Neurais em Grafos (GNNs)** com o objetivo de identificar e classificar *fake news* usando embeddings de texto e relações de similaridade semântica. Aqui está um **resumo estruturado**:
 
 ---
@@ -12,6 +8,7 @@ Esse código implementa um fluxo completo de processamento de notícias usando *
 
 * **Carrega um dataset** contendo textos de notícias e suas classes (`fake` ou `real`).
 * Utiliza o modelo `distiluse-base-multilingual-cased` da **Sentence Transformers** para transformar os textos em vetores (`embeddings`).
+* Resumo de embeddings: https://github.com/ML-Passionate/GNN/blob/main/EMBEDDINGS.md
 
 ---
 
@@ -27,6 +24,9 @@ Esse código implementa um fluxo completo de processamento de notícias usando *
 ---
 
 ### 🔹 3. **Visualização Interativa**
+
+![image](https://github.com/user-attachments/assets/826353d0-4b14-4694-bfe2-ed36ad04dace)
+
 
 * Usa `Plotly` para exibir a estrutura do grafo.
 * Gera layouts com `spring_layout` para posicionar os nós.
@@ -70,6 +70,7 @@ Combinar NLP e GNN para:
 
 ---
 
+Curso LOG disponível no https://www.youtube.com/live/Lj0-Qwzo_B0
 Deseja que eu gere um fluxograma para ilustrar esse pipeline?
 
 
