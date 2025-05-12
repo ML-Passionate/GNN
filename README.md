@@ -5,6 +5,7 @@ Esse código implementa um fluxo completo de processamento de notícias usando *
 ---
 
 ### 🔹 1. **Pré-processamento e Embeddings**
+![image](https://github.com/user-attachments/assets/7b6cdd69-b67e-4ca2-b605-321cb7d52567)
 
 * **Carrega um dataset** contendo textos de notícias e suas classes (`fake` ou `real`).
 * Utiliza o modelo `distiluse-base-multilingual-cased` da **Sentence Transformers** para transformar os textos em vetores (`embeddings`).
@@ -71,7 +72,5 @@ Combinar NLP e GNN para:
 ---
 
 Curso LOG disponível no https://www.youtube.com/live/Lj0-Qwzo_B0
-Deseja que eu gere um fluxograma para ilustrar esse pipeline?
-
 
 
