@@ -2,7 +2,7 @@
 
 ## 🔷 O que é um *embedding*?
 
-![image](https://github.com/user-attachments/assets/abaed47c-4c99-4d31-aa86-cd89ce1e32b4)
+![image](https://github.com/ML-Passionate/GNN/blob/main/images/embenddings.png)
 
 Um **embedding** é uma representação vetorial densa e de baixa dimensão de um dado (texto, imagem, tempo, etc.), projetada para **capturar semelhanças semânticas ou estruturais** em um espaço numérico contínuo.
 
