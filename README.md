@@ -5,7 +5,7 @@ Esse código implementa um fluxo completo de processamento de notícias usando *
 ---
 
 ### 🔹 1. **Pré-processamento e Embeddings**
-![image](https://github.com/user-attachments/assets/7b6cdd69-b67e-4ca2-b605-321cb7d52567)
+![image](https://github.com/ML-Passionate/GNN/blob/main/images/embenddings.png)
 
 * **Carrega um dataset** contendo textos de notícias e suas classes (`fake` ou `real`).
 * Utiliza o modelo `distiluse-base-multilingual-cased` da **Sentence Transformers** para transformar os textos em vetores (`embeddings`).
@@ -26,7 +26,7 @@ Esse código implementa um fluxo completo de processamento de notícias usando *
 
 ### 🔹 3. **Visualização Interativa**
 
-![image](https://github.com/user-attachments/assets/826353d0-4b14-4694-bfe2-ed36ad04dace)
+![image](https://github.com/ML-Passionate/GNN/blob/main/images/grafo.png)
 
 
 * Usa `Plotly` para exibir a estrutura do grafo.
